@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>슈퍼튜나포유 마케팅 대시보드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;background:#FFF0F7;color:#1A1A2E;min-height:100vh;}
+
+/* HEADER */
+.hd{background:#0F1442;padding:16px 28px;display:flex;align-items:center;gap:12px;}
+.hd-logo{background:#E8267F;color:#fff;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.hd h1{color:#fff;font-size:15px;font-weight:900;letter-spacing:-0.3px;}
+.hd p{color:rgba(255,255,255,0.45);font-size:11px;margin-top:2px;}
+
+/* NAV */
+.nav{background:#141B55;display:flex;border-bottom:2.5px solid #E8267F;}
+.nb{padding:12px 22px;border:none;background:transparent;color:rgba(255,255,255,0.5);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-0.2px;}
+.nb.on{background:#E8267F;color:#fff;font-weight:700;}
+.nb:hover:not(.on){color:rgba(255,255,255,0.85);}
+
+/* PAGES */
+.pg{display:none;}
+.pg.on{display:block;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1280px;margin:0 auto;padding:24px 22px;align-items:start;}
+
+/* CARD */
+.card{background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 20px rgba(232,38,127,0.07);}
+.ct{font-size:14px;font-weight:700;color:#0F1442;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.ct-num{background:#FFD6EC;color:#E8267F;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+
+/* FORM */
+.fg{margin-bottom:14px;}
+label{display:block;font-size:10.5px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+input[type=text],textarea{width:100%;padding:9px 12px;border:1.5px solid #FFD6EC;border-radius:9px;font-size:13px;font-family:inherit;color:#1A1A2E;background:#fff;outline:none;transition:border-color .15s;line-height:1.65;}
+input[type=text]:focus,textarea:focus{border-color:#E8267F;}
+textarea{resize:vertical;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{padding:5px 12px;border-radius:18px;border:1.5px solid #FFD6EC;background:transparent;color:#aaa;font-size:12px;cursor:pointer;font-family:inherit;transition:all .12s;}
+.chip.on{border-color:#E8267F;background:#FFD6EC;color:#E8267F;font-weight:700;}
+
+/* RUN BTN */
+.rbtn{width:100%;padding:12px;background:#E8267F;color:#fff;border:none;border-radius:11px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:6px;transition:opacity .15s;letter-spacing:-.2px;}
+.rbtn:hover{opacity:.88;}
+.rbtn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* OUTPUT */
+.oh{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
+.ol{font-size:10.5px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.5px;}
+.cbtn{padding:4px 11px;border:1.5px solid #FFD6EC;border-radius:7px;background:transparent;color:#E8267F;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;display:none;transition:background .12s;}
+.cbtn:hover{background:#FFD6EC;}
+.ob{background:#FAFAFA;border:1px solid #FFD6EC;border-radius:11px;padding:16px;min-height:190px;font-size:13px;line-height:1.9;color:#1A1A2E;white-space:pre-wrap;word-break:break-word;}
+.ph{color:#CCC;text-align:center;padding-top:55px;font-size:12.5px;line-height:1.8;}
+
+/* LOADING */
+.ld{display:flex;flex-direction:column;align-items:center;gap:12px;padding:45px 20px;}
+.sp{width:34px;height:34px;border:3px solid #FFD6EC;border-top-color:#E8267F;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.lt{font-size:12.5px;font-weight:700;color:#E8267F;}
+
+/* INSIGHT GRID */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+
+/* BADGE */
+.bdg{background:#FFD6EC;color:#E8267F;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;display:inline-block;margin-bottom:12px;}
+
+/* HR */
+hr{border:none;border-top:1px solid #FFD6EC;margin:14px 0;}
+
+/* SECTION LABEL */
+.sl{font-size:10.5px;font-weight:700;color:#0F1442;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hd">
+  <div class="hd-logo">🐟</div>
+  <div>
+    <h1>슈퍼튜나포유 마케팅 대시보드</h1>
+    <p>Super Tuna For You · 동원참치 캠페인 콘텐츠 AI 제작 도구</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nb on" onclick="go('planning',this)">📋 기획안</button>
+  <button class="nb" onclick="go('execution',this)">✍️ 실행안</button>
+  <button class="nb" onclick="go('insight',this)">📊 META 인사이트</button>
+</div>
+
+<!-- ========== PAGE 1: PLANNING ========== -->
+<div id="pg-planning" class="pg on">
+  <div class="grid">
+    <div class="card">
+      <div class="ct"><div class="ct-num">1</div>기획안 생성</div>
+
+      <div class="fg">
+        <label>콘텐츠 유형</label>
+        <div class="chips" id="ctype">
+          <button class="chip on" onclick="selOne(this,'ctype')">일반</button>
+          <button class="chip" onclick="selOne(this,'ctype')">이벤트</button>
+          <button class="chip" onclick="selOne(this,'ctype')">레시피</button>
+          <button class="chip" onclick="selOne(this,'ctype')">콜라보</button>
+          <button class="chip" onclick="selOne(this,'ctype')">Jin 특집</button>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>이슈사항 / 기획 배경 * (제품명도 함께 작성)</label>
+        <textarea id="p-issue" rows="8" placeholder="어떤 이슈나 배경으로 콘텐츠를 기획하고 있나요? 제품명도 여기에 함께 적어주세요.
+
+예) 고추참치 + 슈퍼참치 활용 레시피 콘텐츠 기획 필요. 진이 컴백 후 첫 라이브 진행 기념 이벤트 예정. 경품은 슈퍼참치 8입팩 5명."></textarea>
+      </div>
+
+      <div class="fg">
+        <label>추가 메모 (선택)</label>
+        <textarea id="p-memo" rows="2" placeholder="특별히 강조할 포인트, 피해야 할 톤 등"></textarea>
+      </div>
+
+      <button class="rbtn" id="p-btn" onclick="runPlanning()">기획안 생성하기 →</button>
+    </div>
+
+    <div class="card">
+      <div class="ct"><div class="ct-num">✨</div>기획안 결과</div>
+      <div class="oh">
+        <span class="ol">OUTPUT</span>
+        <button class="cbtn" id="p-cbtn" onclick="copy('p-out',this)">📋 복사</button>
+      </div>
+      <div class="ob" id="p-out">
+        <div class="ph">이슈사항을 입력하면<br>기획의도 3줄 + 예시 멘션안이 생성됩니다</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 2: EXECUTION ========== -->
+<div id="pg-execution" class="pg">
+  <div class="grid">
+    <div class="card">
+      <div class="ct"><div class="ct-num">2</div>실행안 생성</div>
+      <span class="bdg">기획안 → 실행안 순서로 진행해주세요</span>
+
+      <div class="fg">
+        <label>기획안 내용 *</label>
+        <textarea id="e-brief" rows="5" placeholder="앞서 생성한 기획안 내용을 붙여넣으세요."></textarea>
+      </div>
+
+      <div class="fg">
+        <label>완성된 콘텐츠 설명 *</label>
+        <textarea id="e-desc" rows="5" placeholder="제작 완료된 콘텐츠(비주얼/영상/이미지)를 설명해주세요.
+어떤 장면인지, 어떤 포인트를 강조하는지, 모델/제품 구성 등."></textarea>
+      </div>
+
+      <div class="fg">
+        <label>이벤트 정보 (이벤트성인 경우만)</label>
+        <textarea id="e-event" rows="3" placeholder="참여방법 / 기간 (YY.MM.DD ~ YY.MM.DD) / 경품 및 수량"></textarea>
+      </div>
+
+      <button class="rbtn" id="e-btn" onclick="runExecution()">실행안 생성하기 →</button>
+    </div>
+
+    <div class="card">
+      <div class="ct"><div class="ct-num">✨</div>실행안 결과</div>
+      <div class="oh">
+        <span class="ol">OUTPUT</span>
+        <button class="cbtn" id="e-cbtn" onclick="copy('e-out',this)">📋 복사</button>
+      </div>
+      <div class="ob" id="e-out">
+        <div class="ph">기획안과 콘텐츠 정보를 입력하면<br>최종 멘션안(한국어 + 영어) + 해시태그가 생성됩니다</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 3: INSIGHT ========== -->
+<div id="pg-insight" class="pg">
+  <div style="max-width:1280px;margin:0 auto;padding:24px 22px;">
+
+    <!-- 상단 헤더 정보 -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="ct"><div class="ct-num">3</div>META 광고 성과 입력</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;">
+        <div class="fg" style="margin:0;">
+          <label>보고 기간</label>
+          <input type="text" id="i-period" placeholder="예) 25.04.01 ~ 25.04.30">
+        </div>
+        <div class="fg" style="margin:0;">
+          <label>보고 유형</label>
+          <div class="chips" id="i-rtype">
+            <button class="chip on" onclick="selOne(this,'i-rtype')">주간보고</button>
+            <button class="chip" onclick="selOne(this,'i-rtype')">월간보고</button>
+          </div>
+        </div>
+        <div class="fg" style="margin:0;">
+          <label>추가 맥락 / 메모</label>
+          <input type="text" id="i-memo" placeholder="캠페인 목표, 특이사항 등">
+        </div>
+        <button class="rbtn" id="i-btn" onclick="runInsight()" style="width:140px;margin:0;">인사이트 생성 →</button>
+      </div>
+    </div>
+
+    <!-- 소재별 데이터 테이블 -->
+    <div class="card" style="margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div class="ct" style="margin:0;"><div class="ct-num">📊</div>소재별 성과 데이터</div>
+        <button onclick="addRow()" style="padding:6px 14px;background:#FFD6EC;color:#E8267F;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">+ 소재 추가</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="ins-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1640px;">
+          <thead>
+            <tr style="background:#FFF0F7;">
+              <th style="padding:8px 6px;text-align:left;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:130px;">소재명</th>
+              <th style="padding:8px 6px;text-align:left;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:90px;">유형</th>
+              <th style="padding:8px 6px;text-align:left;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:65px;">목표</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:75px;">예산</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:75px;">지출금액</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:72px;">동영상조회</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#E8267F;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:75px;background:#FFF8FB;">동영상<br>결과당비용</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:60px;">참여</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#E8267F;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:72px;background:#FFF8FB;">참여<br>결과당비용</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:60px;">도달</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#E8267F;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:75px;background:#FFF8FB;">도달<br>결과당비용</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:60px;">노출</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#E8267F;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:70px;background:#FFF8FB;">CPM</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:60px;">링크클릭</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#E8267F;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:62px;background:#FFF8FB;">CTR(%)</th>
+              <th style="padding:8px 6px;text-align:right;font-weight:700;color:#E8267F;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:70px;background:#FFF8FB;">CPC(원)</th>
+              <th style="padding:8px 6px;text-align:center;font-weight:700;color:#0F1442;white-space:nowrap;border-bottom:2px solid #FFD6EC;min-width:72px;">분포 이미지</th>
+              <th style="padding:8px 6px;border-bottom:2px solid #FFD6EC;min-width:28px;"></th>
+            </tr>
+          </thead>
+          <tbody id="ins-tbody"></tbody>
+          <tfoot>
+            <tr id="tot-row" style="background:#0F1442;color:#fff;font-size:12px;font-weight:700;">
+              <td colspan="3" style="padding:9px 6px;letter-spacing:.5px;">TOTAL</td>
+              <td id="tot-budget" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-spent" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-views" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-vcost" style="padding:9px 6px;text-align:right;color:#FFD6EC;">-</td>
+              <td id="tot-eng" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-ecost" style="padding:9px 6px;text-align:right;color:#FFD6EC;">-</td>
+              <td id="tot-reach" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-rcost" style="padding:9px 6px;text-align:right;color:#FFD6EC;">-</td>
+              <td id="tot-impr" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-cpm" style="padding:9px 6px;text-align:right;color:#FFD6EC;">-</td>
+              <td id="tot-clicks" style="padding:9px 6px;text-align:right;">-</td>
+              <td id="tot-ctr" style="padding:9px 6px;text-align:right;color:#FFD6EC;">-</td>
+              <td id="tot-cpc" style="padding:9px 6px;text-align:right;color:#FFD6EC;">-</td>
+              <td style="padding:9px 6px;"></td>
+              <td style="padding:9px 6px;"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- 결과 -->
+    <div class="card">
+      <div class="ct"><div class="ct-num">✨</div>인사이트 결과</div>
+      <div class="oh">
+        <span class="ol">OUTPUT</span>
+        <button class="cbtn" id="i-cbtn" onclick="copy('i-out',this)">📋 복사</button>
+      </div>
+      <div class="ob" id="i-out" style="min-height:240px;">
+        <div class="ph">소재 데이터를 입력하고 인사이트 생성 버튼을 누르세요<br><br>명사형 종결어미 / 불릿+서브불릿(ㄴ) 형식</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========== BRAND DB ========== */
+const DB = `
+=== 동원참치 마케팅 DB (슈퍼튜나포유 캠페인) ===
+
+[캠페인 정보]
+캠페인명: Super Tuna For You / #슈퍼튜나포유
+태그라인: YES, WE CAN! / 마음과 건강을 함께 전하는 #슈퍼튜나포유
+브랜드 앰배서더: BTS 진(Jin)
+메인 카피: "슈퍼한 너, 고단백으로 슈퍼 응원해!"
+USP: 고단백 슈퍼참치(건강) + 슈퍼 밥도둑 고추참치(맛)
+공식 인스타그램: @dw.tuna
+마스코트: 다랑이(Darangi), 꼬달이(Kkodalee)
+기획 배경: 제품(맛/건강) + 참여(캔꾸) + 스토리텔링(응원/선물) 결합
+
+[제품 라인업]
+슈퍼참치 / 고추참치 / 올리브참치 / 참치뱃살 / 참치액(다시) / 참치파테 / 양반(김·시즌드) / 청동원(편의점 라인)
+기획 제품: 90G·135G·150G 낱캔 × 랜덤 7종 디자인, 8입·10입 팩
+
+[굿즈 & 캔꾸 문화]
+96종 랜덤 슈퍼-티커 스티커 (8입 팩 캔 사이 동봉, 한글OR영문, 3,000가지 이름 조합 가능)
+캔꾸(캔 꾸미기): DIY·다꾸·틴꾸 트렌드 활용한 참여형 굿즈
+
+주요 스티커 문구(국문A·B):
+슈퍼해진 나! / 진심은 결국 통한다! / 오늘도 너만의 템포로 / 수고했어 오늘도! / 외로워도 슬퍼도 참치마! / 진심으로 잘하고 있어! / 열정 한 캔 오픈! / 퇴근은 참치마요 / 오늘도 튜나파워! / 참 잘했치! / 캔처럼 단단하게 오늘도 버틴다! / GO단백 파워 ON / 슈퍼해지자! / 캔슬 말고 캔 두잇! / 자신감 풀충전 / 야근도 언젠간 퇴근! / 네가 하면 슈퍼 오케이 / 실패? 오케이 다음~ / 버텨낸 너 슈퍼해! / 행복 충전! 기운 동원! / 살짝 매워야 재미있지!
+
+주요 스티커 문구(영문):
+YES YOU CAN / SUPER VIBES / HIGHER PROTEIN HIGHER VIBES / NOT PERFECT JUST REAL / DO IT YOUR WAY / STAY SPICY / MAIN CHARACTER ENERGY / SUPER YOU / TOO COOL TO QUIT / Wild Young & Free / CAN DO EVERYTHING / BLOOMING ON / SUPER TODAY / GO SUPER MODE / MOOD: UNSTOPPABLE / Open the Can Open Your Power / Super way, your way / It's chill / No stress today / Still with you
+
+[타깃 오디언스]
+1차: MZ세대 BTS ARMY (국내/글로벌)
+2차: 건강의식 소비자 / 레시피 관심층 / 일반 2030세대
+
+[브랜드 보이스]
+- MZ세대 친화적, 캐주얼하되 억지스럽지 않게
+- 짧고 펀치력 있는 훅 라인으로 시작
+- 이모지 전략적 사용 (과하지 않게)
+- 자연스러운 제품 통합 (광고티 없이)
+- 언어유희 적극 활용:
+  참치 → "참치마!", "참! 잘했치", "팔딱팔딱 뛰는 참-치!", "참치도운"
+  진(Jin) → "진심"/"Jin심"/"Jin-uine"/"진짜"/"슈퍼해진 나"
+
+캠페인 키워드: 슈퍼해진 나 / 슈퍼한 너 / 진심은 결국 통한다 / 고단백으로 슈퍼 응원해 / 오늘도 너만의 템포로 / 캔처럼 단단하게 / YES WE CAN / 마음과 건강을 함께 전하는
+
+[해시태그 세트]
+Jin 필수: #dongwontuna #동원참치 #BTS진 #BTSJin #Jin
+캠페인: #슈퍼튜나포유 #슈퍼참치 #캔꾸 #SuperTunaForYou
+제품: #tuna #supertuna #고단백 #맛있는단백질 #단백질 #HighProtein #healthy #Kspicy #Kfood
+이벤트 추가: #댓글이벤트 #선물이벤트 #이벤트참여
+
+[영문 번역 대응표]
+팔딱팔딱 → Fresh & lively
+진심 → Jin-uine (언어유희 살리기)
+참치로운 → Tuna-ful
+캔꾸 → Can decoration / Can customizing
+슈퍼참치 → Super Tuna
+다랑이 → Darangi
+고단백 → High-protein
+맛없없 → Can't go wrong
+슈퍼한 너 → Super you
+슈퍼해진 나 → The super me
+
+[이벤트성 콘텐츠 필수 3요소]
+✅ 참여방법 (단계별로 명확히)
+✅ 기간 (구체적인 날짜)
+✅ 경품 (수량 포함)
+`;
+
+/* ========== SYSTEM PROMPTS ========== */
+const SYS_PLAN = `당신은 동원참치 SNS 마케팅 10년차 시니어 마케터이자 센스있는 카피라이터입니다.
+
+${DB}
+
+[기획안 작성 규칙]
+사용자가 이슈사항·배경을 입력하면 아래 형식으로 작성하세요.
+
+■ 기획의도
+반드시 3줄, 각 줄은 명사형 종결어미로 끝낼 것.
+예: "BTS 진 컴백 시즌 팬덤 관심 고조에 따른 선제적 바이럴 콘텐츠 필요성 대두"
+
+1. [배경/이슈 - 명사형]
+2. [전략 방향 - 명사형]
+3. [기대 효과 - 명사형]
+
+■ 예시 멘션안 (초안)
+콘텐츠 유형별 포맷 적용:
+- 이벤트성: 참여방법(단계별)/경품(수량)/기간 구조 필수
+- 일반: 훅 라인 + 자연스러운 제품 연결 + 해시태그
+- 레시피: 재료 + 만드는 방법 + 마무리 멘트
+- 콜라보: 두 브랜드 시너지 강조
+- Jin 특집: 간접 암시 방식, 플레이어블 디나이어빌리티 유지
+
+해시태그는 콘텐츠 성격에 맞게 선별 포함.`;
+
+const SYS_EXEC = `당신은 동원참치 SNS 마케팅 10년차 시니어 마케터이자 센스있는 카피라이터입니다.
+
+${DB}
+
+[실행안 작성 규칙]
+사용자가 기획안 + 완성된 콘텐츠 정보를 주면 최종 실행 멘션안을 작성하세요.
+
+■ 한국어 멘션안 (최종)
+완성된 비주얼에 딱 맞게 조율된 버전.
+이벤트성이면 참여방법(단계별)/기간(구체적날짜)/경품(수량포함) 필수.
+줄바꿈 적극 활용, 짧은 문장 위주.
+
+■ English Version
+직역 금지. 영어권에서 자연스럽게 읽히도록. 언어유희 재창작.
+이모지 구조 동일하게 유지.
+
+■ 해시태그
+콘텐츠 성격에 맞게 최적 선별. 과하지 않게.`;
+
+const SYS_INS = `당신은 동원참치 SNS 마케팅 10년차 시니어 마케터입니다. META 광고 성과 데이터를 분석하여 보고서 인사이트를 작성합니다.
+
+${DB}
+
+[인사이트 작성 규칙]
+1. 모든 문장 종결어미: 반드시 명사형
+   ❌ "효율이 높습니다" → ✅ "효율 우위 확인"
+   ❌ "분석이 필요합니다" → ✅ "추가 분석 필요"
+
+2. 불릿 + 서브불릿(ㄴ) 형식:
+• [메인 인사이트]
+  ㄴ [수치 근거]
+  ㄴ [시사점]
+
+3. 분석 포인트:
+- CPM/CPC/CTR 효율 평가 및 전주 대비 변화
+- 성별 분포 vs 캠페인 타깃(MZ·ARMY) 대비 분석
+- 핵심: 동일 타깃 설정에서도 크리에이티브 소재 자체가 알고리즘 성별·연령 분포에 영향을 미침 → 이를 인사이트에 명시적으로 반영
+- 지면별(피드/릴스/스토리) 성과 차이 및 최적 지면 제언
+- 개선 제언 (다음 소재 기획 방향)`;
+
+/* ========== UI HELPERS ========== */
+function go(page, el) {
+  document.querySelectorAll('.pg').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+  document.getElementById('pg-'+page).classList.add('on');
+  el.classList.add('on');
+}
+
+function selOne(el, groupId) {
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function getCtypeText() {
+  const chips = document.querySelectorAll('#ctype .chip.on');
+  return chips.length ? chips[0].textContent : '일반';
+}
+
+function getItypeText() {
+  const chips = document.querySelectorAll('#i-rtype .chip.on');
+  return chips.length ? chips[0].textContent : '주간보고';
+}
+
+function showLoading(outId) {
+  document.getElementById(outId).innerHTML = `<div class="ld"><div class="sp"></div><div class="lt">AI가 작성 중입니다...</div></div>`;
+}
+
+function showResult(outId, cbtnId, text) {
+  const el = document.getElementById(outId);
+  el.textContent = text;
+  document.getElementById(cbtnId).style.display = 'inline';
+}
+
+function setBtnState(btnId, disabled, text) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = disabled;
+  btn.textContent = text;
+}
+
+function copy(outId, btn) {
+  const text = document.getElementById(outId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨!';
+    setTimeout(() => btn.textContent = orig, 1600);
+  }).catch(() => alert('복사에 실패했습니다. 직접 선택해서 복사해주세요.'));
+}
+
+/* ===== 행별 이미지 관리 ===== */
+const rowImgs = {}; // { rowId: { b64, type } }
+
+function selectRowImg(r) {
+  document.getElementById('ri-input-' + r).click();
+}
+function handleRowImg(r, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    rowImgs[r] = { b64: e.target.result.split(',')[1], type: file.type || 'image/jpeg' };
+    const thumb = document.getElementById('ri-thumb-' + r);
+    thumb.src = e.target.result;
+    thumb.style.display = 'block';
+    document.getElementById('ri-btn-' + r).style.display = 'none';
+    document.getElementById('ri-rm-' + r).style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+function removeRowImg(r, e) {
+  e.stopPropagation();
+  delete rowImgs[r];
+  document.getElementById('ri-thumb-' + r).style.display = 'none';
+  document.getElementById('ri-thumb-' + r).src = '';
+  document.getElementById('ri-btn-' + r).style.display = 'inline-block';
+  document.getElementById('ri-rm-' + r).style.display = 'none';
+  document.getElementById('ri-input-' + r).value = '';
+}
+
+/* ===== 인사이트 테이블 행 관리 ===== */
+let rowCount = 0;
+
+const CS = 'padding:4px 3px;border-bottom:1px solid #FFD6EC;';
+const IS = 'width:100%;padding:5px 6px;border:1px solid #FFD6EC;border-radius:6px;font-size:11.5px;font-family:inherit;color:#1A1A2E;background:#fff;outline:none;';
+const NI = (id, ph, r) => `<input type="text" id="${id}" placeholder="${ph}" style="${IS}text-align:right;" oninput="calcRow(${r})">`;
+const CC = (id) => `<div id="${id}" style="background:#FFF0F7;color:#E8267F;padding:5px 6px;border-radius:6px;font-size:11.5px;text-align:right;min-height:26px;white-space:nowrap;">-</div>`;
+
+function numVal(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat(el.value.replace(/,/g,'')) || 0;
+}
+
+function fmtN(n) { return n > 0 ? Math.round(n).toLocaleString('ko-KR') : '-'; }
+function fmtD(n, d=2) { return (n > 0 && isFinite(n)) ? n.toLocaleString('ko-KR', {minimumFractionDigits:d, maximumFractionDigits:d}) : '-'; }
+
+function calcRow(r) {
+  const spent  = numVal(`r${r}-spent`);
+  const views  = numVal(`r${r}-views`);
+  const eng    = numVal(`r${r}-eng`);
+  const reach  = numVal(`r${r}-reach`);
+  const impr   = numVal(`r${r}-impr`);
+  const clicks = numVal(`r${r}-clicks`);
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+
+  set(`r${r}-vcost`, views  > 0 ? fmtD(spent / views, 0)              : '-');
+  set(`r${r}-ecost`, eng    > 0 ? fmtD(spent / eng, 0)                : '-');
+  set(`r${r}-rcost`, reach  > 0 ? fmtD((spent / reach) * 1000, 0)     : '-');
+  set(`r${r}-cpm`,   impr   > 0 ? fmtD((spent / impr) * 1000, 0)      : '-');
+  set(`r${r}-ctr`,   impr   > 0 ? fmtD((clicks / impr) * 100, 2)+'%'  : '-');
+  set(`r${r}-cpc`,   clicks > 0 ? fmtD(spent / clicks, 0)             : '-');
+
+  calcTotal();
+}
+
+function calcTotal() {
+  let tBudget=0, tSpent=0, tViews=0, tEng=0, tReach=0, tImpr=0, tClicks=0;
+  document.querySelectorAll('#ins-tbody tr').forEach(tr => {
+    const r = tr.id.replace('row-','');
+    tBudget += numVal(`r${r}-budget`);
+    tSpent  += numVal(`r${r}-spent`);
+    tViews  += numVal(`r${r}-views`);
+    tEng    += numVal(`r${r}-eng`);
+    tReach  += numVal(`r${r}-reach`);
+    tImpr   += numVal(`r${r}-impr`);
+    tClicks += numVal(`r${r}-clicks`);
+  });
+
+  const s = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  s('tot-budget', fmtN(tBudget));
+  s('tot-spent',  fmtN(tSpent));
+  s('tot-views',  fmtN(tViews));
+  s('tot-vcost',  tViews  > 0 ? fmtD(tSpent / tViews, 0)            : '-');
+  s('tot-eng',    fmtN(tEng));
+  s('tot-ecost',  tEng    > 0 ? fmtD(tSpent / tEng, 0)              : '-');
+  s('tot-reach',  fmtN(tReach));
+  s('tot-rcost',  tReach  > 0 ? fmtD((tSpent / tReach) * 1000, 0)   : '-');
+  s('tot-impr',   fmtN(tImpr));
+  s('tot-cpm',    tImpr   > 0 ? fmtD((tSpent / tImpr) * 1000, 0)    : '-');
+  s('tot-clicks', fmtN(tClicks));
+  s('tot-ctr',    tImpr   > 0 ? fmtD((tClicks / tImpr) * 100, 2)+'%': '-');
+  s('tot-cpc',    tClicks > 0 ? fmtD(tSpent / tClicks, 0)           : '-');
+}
+
+function addRow() {
+  rowCount++;
+  const r = rowCount;
+  const tbody = document.getElementById('ins-tbody');
+  const tr = document.createElement('tr');
+  tr.id = 'row-' + r;
+  tr.style.cssText = 'transition:background .1s;';
+  tr.onmouseenter = () => tr.style.background='#FFFBFD';
+  tr.onmouseleave = () => tr.style.background='';
+  tr.innerHTML = `
+    <td style="${CS}"><input type="text" id="r${r}-name" placeholder="소재명" style="${IS}"></td>
+    <td style="${CS}">
+      <select id="r${r}-type" style="${IS}">
+        <option>단일 이미지</option><option>영상</option><option>캐러셀 이미지</option>
+      </select>
+    </td>
+    <td style="${CS}">
+      <select id="r${r}-goal" style="${IS}">
+        <option>도달</option><option>조회</option><option>참여</option>
+      </select>
+    </td>
+    <td style="${CS}">${NI('r'+r+'-budget','120,000',r)}</td>
+    <td style="${CS}">${NI('r'+r+'-spent','119,962',r)}</td>
+    <td style="${CS}">${NI('r'+r+'-views','-',r)}</td>
+    <td style="${CS}background:#FFF8FB;">${CC('r'+r+'-vcost')}</td>
+    <td style="${CS}">${NI('r'+r+'-eng','-',r)}</td>
+    <td style="${CS}background:#FFF8FB;">${CC('r'+r+'-ecost')}</td>
+    <td style="${CS}">${NI('r'+r+'-reach','-',r)}</td>
+    <td style="${CS}background:#FFF8FB;">${CC('r'+r+'-rcost')}</td>
+    <td style="${CS}">${NI('r'+r+'-impr','-',r)}</td>
+    <td style="${CS}background:#FFF8FB;">${CC('r'+r+'-cpm')}</td>
+    <td style="${CS}">${NI('r'+r+'-clicks','-',r)}</td>
+    <td style="${CS}background:#FFF8FB;">${CC('r'+r+'-ctr')}</td>
+    <td style="${CS}background:#FFF8FB;">${CC('r'+r+'-cpc')}</td>
+    <td style="${CS}text-align:center;vertical-align:middle;min-width:72px;">
+      <input type="file" id="ri-input-${r}" accept="image/*" style="display:none" onchange="handleRowImg(${r},this)">
+      <button id="ri-btn-${r}" onclick="selectRowImg(${r})" style="background:#F5F5F5;border:1.5px dashed #DDD;border-radius:7px;padding:5px 8px;color:#AAA;font-size:11px;cursor:pointer;font-family:inherit;display:inline-block;">📷 추가</button>
+      <div style="position:relative;display:inline-block;">
+        <img id="ri-thumb-${r}" style="display:none;max-height:52px;max-width:64px;border-radius:5px;object-fit:cover;cursor:pointer;border:1.5px solid #FFD6EC;" onclick="selectRowImg(${r})">
+        <button id="ri-rm-${r}" onclick="removeRowImg(${r},event)" style="display:none;position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#E8267F;border:none;color:#fff;font-size:10px;line-height:16px;cursor:pointer;padding:0;">✕</button>
+      </div>
+    </td>
+    <td style="${CS}text-align:center;">
+      <button onclick="delRow(${r})" style="background:transparent;border:none;color:#FFB3D1;font-size:15px;cursor:pointer;padding:2px 6px;" title="삭제">✕</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function delRow(r) {
+  const el = document.getElementById('row-' + r);
+  if (el) { el.remove(); delete rowImgs[r]; calcTotal(); }
+}
+
+function getRowsData() {
+  const rows = document.querySelectorAll('#ins-tbody tr');
+  return [...rows].map((tr, idx) => {
+    const r = tr.id.replace('row-','');
+    const gv = id => { const el=document.getElementById(id); return el ? el.value.trim() : ''; };
+    const gn = id => numVal(id);
+    const spent=gn(`r${r}-spent`), views=gn(`r${r}-views`), eng=gn(`r${r}-eng`),
+          reach=gn(`r${r}-reach`), impr=gn(`r${r}-impr`),   clicks=gn(`r${r}-clicks`);
+    return {
+      no: idx+1, rawId: r,
+      name: gv(`r${r}-name`) || `소재 ${idx+1}`,
+      type: gv(`r${r}-type`), goal: gv(`r${r}-goal`),
+      budget: gv(`r${r}-budget`), spent: gv(`r${r}-spent`),
+      views: gv(`r${r}-views`),
+      vcost: views>0  ? Math.round(spent/views).toLocaleString('ko-KR')+'원'           : '-',
+      eng: gv(`r${r}-eng`),
+      ecost: eng>0    ? Math.round(spent/eng).toLocaleString('ko-KR')+'원'              : '-',
+      reach: gv(`r${r}-reach`),
+      rcost: reach>0  ? Math.round((spent/reach)*1000).toLocaleString('ko-KR')+'원'    : '-',
+      impr: gv(`r${r}-impr`),
+      cpm:   impr>0   ? Math.round((spent/impr)*1000).toLocaleString('ko-KR')+'원'     : '-',
+      clicks: gv(`r${r}-clicks`),
+      ctr:   impr>0   ? ((clicks/impr)*100).toFixed(2)+'%'                             : '-',
+      cpc:   clicks>0 ? Math.round(spent/clicks).toLocaleString('ko-KR')+'원'          : '-',
+    };
+  });
+}
+
+/* ========== API ========== */
+async function api(sys, msg) {
+  const res = await fetch('/api/generate', { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system: sys, message: msg }) // 서버로 데이터만 보냄
+  });
+  const d = await res.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.text;
+}
+
+/* ========== HANDLERS ========== */
+async function runPlanning() {
+  const issue = v('p-issue');
+  if (!issue) { alert('이슈사항을 입력해주세요.'); return; }
+
+  showLoading('p-out');
+  setBtnState('p-btn', true, '작성 중...');
+  document.getElementById('p-cbtn').style.display = 'none';
+
+  const msg = `콘텐츠 유형: ${getCtypeText()}
+
+이슈사항/기획 배경:
+${issue}${v('p-memo') ? '\n\n추가 메모:\n' + v('p-memo') : ''}`;
+
+  try {
+    const result = await api(SYS_PLAN, msg);
+    showResult('p-out', 'p-cbtn', result);
+  } catch(e) {
+    document.getElementById('p-out').textContent = '오류가 발생했습니다: ' + e.message;
+  }
+
+  setBtnState('p-btn', false, '기획안 생성하기 →');
+}
+
+async function runExecution() {
+  const brief = v('e-brief');
+  const desc = v('e-desc');
+  if (!brief || !desc) { alert('기획안과 콘텐츠 설명을 모두 입력해주세요.'); return; }
+
+  showLoading('e-out');
+  setBtnState('e-btn', true, '작성 중...');
+  document.getElementById('e-cbtn').style.display = 'none';
+
+  const evInfo = v('e-event');
+  const msg = `[기획안]
+${brief}
+
+[완성된 콘텐츠 설명]
+${desc}${evInfo ? '\n\n[이벤트 정보]\n' + evInfo : ''}`;
+
+  try {
+    const result = await api(SYS_EXEC, msg);
+    showResult('e-out', 'e-cbtn', result);
+  } catch(e) {
+    document.getElementById('e-out').textContent = '오류가 발생했습니다: ' + e.message;
+  }
+
+  setBtnState('e-btn', false, '실행안 생성하기 →');
+}
+
+async function runInsight() {
+  const rows = getRowsData();
+  if (!rows.length) { alert('소재를 최소 1개 이상 추가해주세요.'); return; }
+
+  showLoading('i-out');
+  setBtnState('i-btn', true, '분석 중...');
+  document.getElementById('i-cbtn').style.display = 'none';
+
+  const period = v('i-period');
+  const rtype = getItypeText();
+  const memo = v('i-memo');
+
+  const rowsText = rows.map(r => {
+    const lines = [
+      `No.${r.no} | 소재명: ${r.name} | 유형: ${r.type} | 목표: ${r.goal}`,
+      `예산: ${r.budget}원 | 지출금액: ${r.spent}원`,
+    ];
+    if (r.views !== '-' && r.views) lines.push(`동영상 조회: ${r.views} (결과당 비용: ${r.vcost}원)`);
+    if (r.eng !== '-' && r.eng)   lines.push(`참여: ${r.eng} (결과당 비용: ${r.ecost}원)`);
+    if (r.reach !== '-' && r.reach) lines.push(`도달: ${r.reach} (도달 결과당 비용: ${r.rcost}원/1000명)`);
+    if (r.impr !== '-' && r.impr)  lines.push(`노출: ${r.impr} | CPM: ${r.cpm}원`);
+    if (r.clicks !== '-' && r.clicks) lines.push(`링크 클릭: ${r.clicks} | CTR: ${r.ctr} | CPC: ${r.cpc}원`);
+    return lines.join('\n');
+  }).join('\n\n');
+
+  const msg = `보고 기간: ${period || '미입력'}
+보고 유형: ${rtype}
+${memo ? '추가 맥락: ' + memo : ''}
+
+=== 소재별 성과 데이터 ===
+
+${rowsText}`;
+
+ // ... (생략: 위쪽 변수 설정 부분은 그대로 둠)
+
+  try {
+    // 이미지를 포함한 데이터를 서버로 전송
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        system: SYS_INS, 
+        message: msg,
+        images: rowImgs // 이미지 데이터도 안전하게 서버로 전달
+      })
+    });
+    
+    const d = await res.json();
+    if (d.error) throw new Error(d.error.message);
+    showResult('i-out', 'i-cbtn', d.text || '결과를 가져올 수 없습니다.');
+  } catch(e) {
+    document.getElementById('i-out').textContent = '오류가 발생했습니다: ' + e.message;
+  }
+
+  setBtnState('i-btn', false, '인사이트 생성 →');
+}
+
+/* 초기 행 2개 자동 생성 */
+window.addEventListener('DOMContentLoaded', () => {
+  addRow();
+  addRow();
+});
+</script>
+</body>
+</html>
